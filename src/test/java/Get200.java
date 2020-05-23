@@ -4,10 +4,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.io.IOException;
 import static org.testng.Assert.assertEquals;
-
 
 public class Get200 extends BaseClass {
 
@@ -25,6 +25,14 @@ public class Get200 extends BaseClass {
         response.close();
     }
 
+    @DataProvider
+    private Object[][] endpoints() {
+        return new Object[][] {
+                {"/rate_limit"},
+                {"/search/repositories?q=java"}
+        };
+    }
+
     @Test
     public void baseUrlReturns200() throws IOException {
 
@@ -37,10 +45,10 @@ public class Get200 extends BaseClass {
         assertEquals(actualStatus, 200);
     }
 
-    @Test
-    public void rateLimitReturns200() throws IOException {
+    @Test(dataProvider = "endpoints")
+    public void rateLimitReturns200(String endpoint) throws IOException {
 
-        HttpGet get = new HttpGet(BASE_ENDPOINT + "/rate_limit");
+        HttpGet get = new HttpGet(BASE_ENDPOINT + endpoint);
 
         response = client.execute(get);
 
@@ -49,15 +57,14 @@ public class Get200 extends BaseClass {
         assertEquals(actualStatus, 200);
     }
 
-    @Test
-    public void searchReposReturns200() throws IOException {
+    @Test(dataProvider = "endpoints")
+    public void searchReposReturns200(String endpoint) throws IOException {
 
-        HttpGet get = new HttpGet(BASE_ENDPOINT + "/search/repositories?q=java");
+        HttpGet get = new HttpGet(BASE_ENDPOINT + endpoint);
 
         response = client.execute(get);
 
         int actualStatus = response.getStatusLine().getStatusCode();
         assertEquals(actualStatus, 200);
     }
-
 }
